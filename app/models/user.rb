@@ -3,5 +3,14 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :api
+         :api, :confirmable
+  has_one :user_info, dependent: :destroy
+
+  after_create :create_user_info
+
+  private
+
+  def create_user_info
+    UserInfo.create(user_id: self.id, admin: false)
+  end
 end

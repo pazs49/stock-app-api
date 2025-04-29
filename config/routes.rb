@@ -10,6 +10,12 @@ Rails.application.routes.draw do
   # root "posts#index"
   namespace :api do
     namespace :v1 do
+      get "user_info/get_user_info", to: "user_infos#get_user_info"
+      post "admin/create_user", to: "users#admin_create_user"
+      post "admin/approve_user/:id", to: "users#admin_approve_user"
+      resources :users, only: [:index]
+      ############################
+      post "stocks/search", to: "stocks#search"
     end
   end
 end
