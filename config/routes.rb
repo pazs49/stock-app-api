@@ -16,6 +16,9 @@ Rails.application.routes.draw do
       resources :users, only: [:index]
       ############################
       post "stocks/search", to: "stocks#search"
+      get "stocks", to: "stocks#index"
+      post "stocks/buy", to: "stocks#buy"
+      post "stocks/sell", to: "stocks#sell"
     end
   end
 end

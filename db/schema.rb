@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_29_072839) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_03_063130) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -30,12 +30,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_29_072839) do
     t.index ["resource_owner_type", "resource_owner_id"], name: "index_devise_api_tokens_on_resource_owner"
   end
 
+  create_table "stocks", force: :cascade do |t|
+    t.string "name"
+    t.decimal "price"
+    t.integer "qty"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_info_id"
+    t.index ["user_info_id"], name: "index_stocks_on_user_info_id"
+  end
+
   create_table "user_infos", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.boolean "admin", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "balance", precision: 10, scale: 2, default: "0.0", null: false
+    t.bigint "stock_id"
+    t.index ["stock_id"], name: "index_user_infos_on_stock_id"
     t.index ["user_id"], name: "index_user_infos_on_user_id"
   end
 
@@ -56,5 +68,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_29_072839) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "stocks", "user_infos"
+  add_foreign_key "user_infos", "stocks"
   add_foreign_key "user_infos", "users"
 end
