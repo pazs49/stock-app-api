@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  action: MyString
+  date: 2025-05-05 20:53:19
+  price: 9.99
+  qty: 9.99
+  user_info: one
+
+two:
+  action: MyString
+  date: 2025-05-05 20:53:19
+  price: 9.99
+  qty: 9.99
+  user_info: two

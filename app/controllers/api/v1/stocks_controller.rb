@@ -117,6 +117,16 @@ class Api::V1::StocksController < ApplicationController
       user.user_info.balance += total_price if !is_buy
       user.user_info.balance -= total_price if is_buy
 
+      transaction = Transaction.new(
+        name: symbol,
+        action: is_buy ? "buy" : "sell",
+        date: Time.current,
+        price: latest_price,
+        qty: stock_qty,
+        user_info_id: user.user_info.id
+      )
+      transaction.save
+
       if user.user_info.save
         render json: { message: "Stock #{is_buy ? "bought" : "sold"} successfully" }, status: :ok
       else
