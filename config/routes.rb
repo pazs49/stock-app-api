@@ -11,6 +11,11 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       get "user_info/get_user_info", to: "user_infos#get_user_info"
+      get "user_info/get_user_transactions", to: "user_infos#get_user_transactions"
+      get "user_info/get_user_transactions_admin", to: "user_infos#get_user_transactions_admin"
+      get "user_info/get_user_info_admin/:id", to: "user_infos#get_user_info_admin"
+      post "user_info/edit_user_info_admin/:id", to: "user_infos#edit_user_info_admin"
+      ############################
       post "admin/create_user", to: "users#admin_create_user"
       post "admin/approve_user/:id", to: "users#admin_approve_user"
       resources :users, only: [:index]
@@ -19,6 +24,7 @@ Rails.application.routes.draw do
       get "stocks", to: "stocks#index"
       post "stocks/buy", to: "stocks#buy"
       post "stocks/sell", to: "stocks#sell"
+      ############################
     end
   end
 end

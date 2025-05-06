@@ -21,6 +21,47 @@
   end
 end
 
+# Stock symbols and their current prices
+STOCKS = {
+  "IBM" => 120.75,
+  "AAPL" => 185.25,
+  "GOOGL" => 2850.00,
+  "MSFT" => 330.50,
+  "AMZN" => 125.75,
+  "META" => 310.25,
+  "NVDA" => 425.50,
+  "TSLA" => 190.75,
+  "JPM" => 155.25,
+  "BAC" => 38.50,
+}
+
+# Create transactions for users 11-20
+(11..20).each do |i|
+  user = User.find_by(email: "user#{i}@example.com")
+  next unless user
+
+  # Create 5 random transactions for each user
+  5.times do
+    stock = STOCKS.keys.sample
+    action = %w[buy sell].sample
+    price = STOCKS[stock] * (0.95 + rand(0.1)) # 5-15% variation
+    qty = rand(10..100)
+
+    # Generate a random time within the last year
+    start_date = 1.year.ago
+    end_date = Time.current
+    random_time = start_date + rand * (end_date - start_date)
+
+    user.user_info.transactions << Transaction.create(
+      name: stock,
+      action: action,
+      date: random_time,
+      price: price.round(2),
+      qty: qty,
+    )
+  end
+end
+
 ##########
 percyUser = User.create!(
   email: "percyavon1@example.com",
