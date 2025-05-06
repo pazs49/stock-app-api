@@ -13,4 +13,8 @@ class User < ApplicationRecord
   def create_user_info
     UserInfo.create(user_id: self.id, admin: false)
   end
+
+  def after_confirmation
+    UserMailer.with(user: self).welcome_email.deliver_later
+  end
 end
