@@ -41,13 +41,10 @@ class Api::V1::StocksController < ApplicationController
     #Comment out on live
 
     #Uncomment on live
-    # api_key = ENV["ALPHA_STOCK_API_KEY"]
-    # url = URI("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=#{symbol}&apikey=#{api_key}")
+    # stock_data = fetch_stock_data(symbol)
 
-    # response = Net::HTTP.get_response(url)
-
-    # if response.is_a?(Net::HTTPSuccess)
-    #   data = JSON.parse(response.body)
+    # if stock_data.is_a?(Net::HTTPSuccess)
+    #   data = JSON.parse(stock_data.body)
     #   render json: data
     # else
     #   render json: { error: "Failed to fetch stock data" }, status: :bad_request
@@ -74,13 +71,10 @@ class Api::V1::StocksController < ApplicationController
     end
 
     symbol = params[:symbol]
-    api_key = ENV["ALPHA_STOCK_API_KEY"]
-    url = URI("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=#{symbol}&apikey=#{api_key}")
+    stock_data = fetch_stock_data(symbol)
 
-    response = Net::HTTP.get_response(url)
-
-    if response.is_a?(Net::HTTPSuccess)
-      data = JSON.parse(response.body)
+    if stock_data.is_a?(Net::HTTPSuccess)
+      data = JSON.parse(stock_data.body)
       latest_data = data["Time Series (Daily)"].keys.first
       latest_price = data["Time Series (Daily)"][latest_data]["4. close"].to_f
 
@@ -123,7 +117,7 @@ class Api::V1::StocksController < ApplicationController
         date: Time.current,
         price: latest_price,
         qty: stock_qty,
-        user_info_id: user.user_info.id
+        user_info_id: user.user_info.id,
       )
       transaction.save
 
@@ -139,5 +133,14 @@ class Api::V1::StocksController < ApplicationController
 
   def set_devise_api_token
     @devise_api_token = current_devise_api_token
+  end
+
+  def fetch_stock_data(symbol)
+    api_key = ENV["ALPHA_STOCK_API_KEY"]
+    url = URI("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=#{symbol}&apikey=#{api_key}")
+
+    response = Net::HTTP.get_response(url)
+
+    return response
   end
 end
