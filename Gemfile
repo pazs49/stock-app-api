@@ -17,7 +17,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
-gem "solid_queue"
+# gem "solid_queue"
 gem "solid_cable"
 
 # Reduces boot times through caching; required in config/boot.rb
@@ -44,13 +44,13 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
-  
+
   gem "letter_opener"
 
-  gem 'dotenv-rails'
+  gem "dotenv-rails"
 
-  gem 'rspec-rails'
-  gem 'factory_bot_rails'
+  gem "rspec-rails"
+  gem "factory_bot_rails"
 end
 
 gem "active_model_serializers", "~> 0.10.15"
