@@ -100,6 +100,21 @@ class Api::V1::StocksController < ApplicationController
 
     if stock_data.is_a?(Net::HTTPSuccess)
       data = JSON.parse(stock_data.body)
+
+      # Check for rate limit message
+      if data.key?("Note") || data.key?("Information")
+        Rails.logger.error "Alpha Vantage API limit reached: #{data.inspect}"
+        render json: { error: "Service temporarily unavailable. Please try again later." }, status: :service_unavailable
+        return
+      end
+
+      # Check for missing data structure
+      if !data.key?("Time Series (Daily)") || data["Time Series (Daily)"].empty?
+        Rails.logger.error "Invalid API response format: #{data.inspect}"
+        render json: { error: "Unable to retrieve stock data. Please try again later." }, status: :bad_request
+        return
+      end
+
       latest_data = data["Time Series (Daily)"].keys.first
       latest_price = data["Time Series (Daily)"][latest_data]["4. close"].to_f
 
