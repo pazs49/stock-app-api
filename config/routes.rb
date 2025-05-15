@@ -26,7 +26,7 @@ Rails.application.routes.draw do
       ############################
       post "stocks/search", to: "stocks#search"
       get "stocks", to: "stocks#index"
-      post "stocks/buy", to: "stocks#buy"
+      post "stocks/buy/*", to: "stocks#buy"
       post "stocks/sell", to: "stocks#sell"
       post "stocks/update_stock_price", to: "stocks#update_stock_price"
       ############################
