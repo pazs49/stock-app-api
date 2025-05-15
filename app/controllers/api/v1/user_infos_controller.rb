@@ -1,7 +1,7 @@
 class Api::V1::UserInfosController < ApplicationController
   before_action :authenticate_devise_api_token!
   before_action :set_devise_api_token
-  before_action :set_user, only: [:get_user_info, :get_user_transactions, :get_user_transactions_admin, :edit_user_info_admin, :get_user_info_admin]
+  before_action :set_user, only: [:get_user_info, :get_user_transactions, :get_user_transactions_admin, :edit_user_info_admin, :get_user_info_admin, :edit_user_info, :user_deposit]
 
   def get_user_info
     render json: @user.user_info, meta: { email: @user.email }
@@ -17,6 +17,26 @@ class Api::V1::UserInfosController < ApplicationController
       render json: transactions
     else
       render json: { error: "Unauthorized" }, status: :unauthorized
+    end
+  end
+
+  def edit_user_info
+    user_info = @user.user_info.update(user_info_params_user)
+    if (user_info)
+      render json: user_info, status: :ok
+    else
+      render json: { error: user_info.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def user_deposit
+    user = User.find(@devise_api_token.resource_owner_id)
+    new_balance = user.user_info.balance + params[:amount].to_f
+
+    if user.user_info.update(balance: new_balance)
+      render json: user.user_info, status: :ok
+    else
+      render json: { error: user.user_info.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -49,7 +69,11 @@ class Api::V1::UserInfosController < ApplicationController
     @user = User.find(@devise_api_token.resource_owner_id)
   end
 
+  def user_info_params_user
+    params.require(:user_info).permit(:first_name, :last_name, :address, :birthdate)
+  end
+
   def user_info_params
-    params.require(:user_info).permit(:admin, :balance)
+    params.require(:user_info).permit(:admin, :first_name, :last_name, :address, :birthdate)
   end
 end

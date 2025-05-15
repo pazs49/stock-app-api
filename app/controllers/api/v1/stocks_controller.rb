@@ -4,7 +4,7 @@ require "json"
 
 class Api::V1::StocksController < ApplicationController
   before_action :authenticate_devise_api_token!
-  before_action :set_devise_api_token, only: [:index, :buy, :sell]
+  before_action :set_devise_api_token, only: [:index, :buy, :sell, :update_stock_price]
 
   def index
     user = User.find(@devise_api_token.resource_owner_id)
@@ -15,41 +15,41 @@ class Api::V1::StocksController < ApplicationController
   def search
     symbol = params[:symbol] || "IBM"
 
-    #Comment out on live
-    if symbol.upcase == "IBM"
-      render json: {
-        "Meta Data": {
-          "1. Information": "Daily Prices (open, high, low, close) and Volumes",
-          "2. Symbol": "IBM",
-          "3. Last Refreshed": "2025-04-29",
-          "4. Output Size": "Compact",
-          "5. Time Zone": "US/Eastern",
-        },
-        "Time Series (Daily)": {
-          "2025-04-29": {
-            "1. open": "145.25",
-            "2. high": "146.50",
-            "3. low": "144.75",
-            "4. close": "145.50",
-            "5. volume": "4500000",
-          },
-        },
-      }
-    else
-      render json: { error: "Invalid symbol" }, status: :bad_request
-    end
-    #Comment out on live
-
-    #Uncomment on live
-    # stock_data = fetch_stock_data(symbol)
-
-    # if stock_data.is_a?(Net::HTTPSuccess)
-    #   data = JSON.parse(stock_data.body)
-    #   render json: data
+    # Comment out on live
+    # if symbol.upcase == "IBM"
+    #   render json: {
+    #     "Meta Data": {
+    #       "1. Information": "Daily Prices (open, high, low, close) and Volumes",
+    #       "2. Symbol": "IBM",
+    #       "3. Last Refreshed": "2025-04-29",
+    #       "4. Output Size": "Compact",
+    #       "5. Time Zone": "US/Eastern",
+    #     },
+    #     "Time Series (Daily)": {
+    #       "2025-04-29": {
+    #         "1. open": "145.25",
+    #         "2. high": "146.50",
+    #         "3. low": "144.75",
+    #         "4. close": "145.50",
+    #         "5. volume": "4500000",
+    #       },
+    #     },
+    #   }
     # else
-    #   render json: { error: "Failed to fetch stock data" }, status: :bad_request
+    #   render json: { error: "Invalid symbol" }, status: :bad_request
     # end
-    #Uncomment on live
+    # Comment out on live
+
+    # Uncomment on live
+    stock_data = fetch_stock_data(symbol)
+
+    if stock_data.is_a?(Net::HTTPSuccess)
+      data = JSON.parse(stock_data.body)
+      render json: data
+    else
+      render json: { error: "Failed to fetch stock data" }, status: :bad_request
+    end
+    # Uncomment on live
   end
 
   def buy
@@ -58,6 +58,31 @@ class Api::V1::StocksController < ApplicationController
 
   def sell
     process_stock_transaction(params[:stock_qty].to_i, false)
+  end
+
+  def update_stock_price
+    user = User.find(@devise_api_token.resource_owner_id)
+
+    symbol = params[:symbol]
+
+    stock_data = fetch_stock_data(symbol)
+
+    if stock_data.is_a?(Net::HTTPSuccess)
+      data = JSON.parse(stock_data.body)
+      latest_data = data["Time Series (Daily)"].keys.first
+      latest_price = data["Time Series (Daily)"][latest_data]["4. close"].to_f
+
+      stock = user.user_info.stocks.find_by(name: symbol)
+      if stock
+        stock.price = latest_price
+        stock.save!
+        render json: stock
+      else
+        render json: { error: "Stock not found" }, status: :not_found
+      end
+    else
+      render json: { error: "Server error" }, status: :not_found
+    end
   end
 
   private
@@ -88,6 +113,7 @@ class Api::V1::StocksController < ApplicationController
       stock = user.user_info.stocks.find_by(name: symbol)
 
       if stock
+        stock.price = latest_price
         if is_buy
           stock.qty += stock_qty
         else
@@ -141,6 +167,6 @@ class Api::V1::StocksController < ApplicationController
 
     response = Net::HTTP.get_response(url)
 
-    return response
+    response
   end
 end

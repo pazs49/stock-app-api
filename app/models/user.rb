@@ -5,14 +5,15 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :api, :confirmable
   has_one :user_info, dependent: :destroy
+  accepts_nested_attributes_for :user_info
 
-  after_create :create_user_info
+  # after_create :create_user_info
 
   private
 
-  def create_user_info
-    UserInfo.create(user_id: self.id, admin: false)
-  end
+  # def create_user_info
+  #   UserInfo.create(user_id: self.id, admin: false)
+  # end
 
   def after_confirmation
     UserMailer.with(user: self).welcome_email.deliver_later

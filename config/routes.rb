@@ -10,11 +10,15 @@ Rails.application.routes.draw do
   # root "posts#index"
   namespace :api do
     namespace :v1 do
+      post "user_info", to: "users#create_user_info"
+      #############################
       get "user_info/get_user_info", to: "user_infos#get_user_info"
       get "user_info/get_user_transactions", to: "user_infos#get_user_transactions"
       get "user_info/get_user_transactions_admin", to: "user_infos#get_user_transactions_admin"
       get "user_info/get_user_info_admin/:id", to: "user_infos#get_user_info_admin"
-      post "user_info/edit_user_info_admin/:id", to: "user_infos#edit_user_info_admin"
+      patch "user_info/edit_user_info_admin/:id", to: "user_infos#edit_user_info_admin"
+      post "user_info/edit_user_info", to: "user_infos#edit_user_info"
+      post "user_info/user_deposit", to: "user_infos#user_deposit"
       ############################
       post "admin/create_user", to: "users#admin_create_user"
       post "admin/approve_user/:id", to: "users#admin_approve_user"
@@ -24,6 +28,7 @@ Rails.application.routes.draw do
       get "stocks", to: "stocks#index"
       post "stocks/buy", to: "stocks#buy"
       post "stocks/sell", to: "stocks#sell"
+      post "stocks/update_stock_price", to: "stocks#update_stock_price"
       ############################
     end
   end

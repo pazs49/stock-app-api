@@ -48,6 +48,9 @@ group :development, :test do
   gem "letter_opener"
 
   gem 'dotenv-rails'
+
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
 end
 
 gem "active_model_serializers", "~> 0.10.15"

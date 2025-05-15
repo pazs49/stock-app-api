@@ -1,12 +1,6 @@
 # This file should ensure the existence of records required to run the application in every environment (production,
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
 
 20.times do |i|
   user = User.create!(
@@ -14,7 +8,14 @@
     password: "password",
     confirmed_at: Time.current,
   )
-  user.create_user_info!(admin: false, balance: 50000.0)
+  user.create_user_info!(
+    admin: false,
+    balance: 50000.0,
+    first_name: "John#{i}",
+    last_name: "Doe",
+    address: "123 Main St",
+    birthdate: "1990-01-01",
+  )
 
   if i < 10
     user.update(confirmed_at: nil)
@@ -40,17 +41,13 @@ STOCKS = {
   user = User.find_by(email: "user#{i}@example.com")
   next unless user
 
-  # Create 5 random transactions for each user
   5.times do
     stock = STOCKS.keys.sample
     action = %w[buy sell].sample
-    price = STOCKS[stock] * (0.95 + rand(0.1)) # 5-15% variation
+    price = STOCKS[stock] * (0.95 + rand(0.1))
     qty = rand(10..100)
 
-    # Generate a random time within the last year
-    start_date = 1.year.ago
-    end_date = Time.current
-    random_time = start_date + rand * (end_date - start_date)
+    random_time = 1.year.ago + rand * (Time.current - 1.year.ago)
 
     user.user_info.transactions << Transaction.create(
       name: stock,
@@ -62,51 +59,63 @@ STOCKS = {
   end
 end
 
-##########
+# Create Percy user with stocks
 percyUser = User.create!(
   email: "percyavon1@example.com",
   password: "hello123",
   confirmed_at: Time.current,
 )
 
-percyUser.create_user_info!(admin: false, balance: 69420)
+percyUser.create_user_info!(
+  admin: false,
+  balance: 69420,
+  first_name: "Percy",
+  last_name: "Percyson",
+  address: "123 Main St",
+  birthdate: "2005-01-01",
+)
 
-stock2 = Stock.create(name: "IBM", price: 120.75, qty: 50)
-stock3 = Stock.create(name: "MSFT", price: 320.75, qty: 150)
-stock4 = Stock.create(name: "AMZN", price: 125.40, qty: 75)
-stock5 = Stock.create(name: "TSLA", price: 185.25, qty: 200)
-stock6 = Stock.create(name: "GOOGL", price: 105.80, qty: 125)
-stock7 = Stock.create(name: "NVDA", price: 450.20, qty: 60)
-stock8 = Stock.create(name: "META", price: 350.50, qty: 175)
-stock9 = Stock.create(name: "JPM", price: 150.75, qty: 80)
-stock10 = Stock.create(name: "V", price: 250.45, qty: 140)
-stock11 = Stock.create(name: "JNJ", price: 175.30, qty: 95)
+[
+  ["IBM", 120.75, 50],
+  ["MSFT", 320.75, 150],
+  ["AMZN", 125.40, 75],
+  ["TSLA", 185.25, 200],
+  ["GOOGL", 105.80, 125],
+  ["NVDA", 450.20, 60],
+  ["META", 350.50, 175],
+  ["JPM", 150.75, 80],
+  ["V", 250.45, 140],
+  ["JNJ", 175.30, 95],
+].each do |name, price, qty|
+  stock = Stock.create(name: name, price: price, qty: qty)
+  percyUser.user_info.stocks << stock
+end
 
-percyUser.user_info.stocks << stock2
-percyUser.user_info.stocks << stock3
-percyUser.user_info.stocks << stock4
-percyUser.user_info.stocks << stock5
-percyUser.user_info.stocks << stock6
-percyUser.user_info.stocks << stock7
-percyUser.user_info.stocks << stock8
-percyUser.user_info.stocks << stock9
-percyUser.user_info.stocks << stock10
-percyUser.user_info.stocks << stock11
-
-##########
+# Admin Users
 percyAdmin = User.create!(
   email: "percyavon@example.com",
   password: "hello123",
   confirmed_at: Time.current,
 )
 
-percyAdmin.create_user_info!(admin: true)
-###########
+percyAdmin.create_user_info!(
+  admin: true,
+  first_name: "Percy",
+  last_name: "Admin",
+  address: "123 Admin St",
+  birthdate: "1980-01-01",
+)
+
 admin = User.create!(
   email: "admin@example.com",
   password: "password",
   confirmed_at: Time.current,
 )
 
-admin.create_user_info!(admin: true)
-###########
+admin.create_user_info!(
+  admin: true,
+  first_name: "Admin",
+  last_name: "User",
+  address: "123 Admin St",
+  birthdate: "1980-01-01",
+)

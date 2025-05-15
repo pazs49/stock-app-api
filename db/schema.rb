@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_05_135153) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_14_054533) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -60,6 +60,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_05_135153) do
     t.decimal "balance", precision: 10, scale: 2, default: "0.0", null: false
     t.bigint "stock_id"
     t.string "name"
+    t.string "first_name"
+    t.string "last_name"
+    t.date "birthdate"
+    t.text "address"
     t.index ["stock_id"], name: "index_user_infos_on_stock_id"
     t.index ["user_id"], name: "index_user_infos_on_user_id"
   end
